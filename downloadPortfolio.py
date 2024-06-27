@@ -6,7 +6,9 @@ import uuid
 
 #enter a url and the script will download the images from that site
 #change working directory
-path = r"C:\Users\nnati\OneDrive\Desktop\Portfolio"
+path = input("Enter path to save files to: ")
+path = repr(path) #FIX LATER
+print(path)
 os.chdir(path)
 currentFolder = os.getcwd()
 
