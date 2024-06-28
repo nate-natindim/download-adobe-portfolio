@@ -1,8 +1,11 @@
+#!/usr/bin/env python
+
 import os, requests, sys
 from bs4 import BeautifulSoup
 from PIL import Image
 from urllib.request import urlopen
 import uuid
+import ssl
 
 #enter a url and the script will download the images from that site
 #change working directory
@@ -15,10 +18,21 @@ imageGridClass = r"grid__item-image js-grid__item-image grid__item-image-lazy js
 #grabs url argument from command-line 
 url = sys.argv[1]
 
+#get website
+while True:
+    try:
+        response = requests.get(url, verify=False) #disable SSL certificate validation temporarily
+    except Exception:        
+        print("Invalid site. Enter site:")
+        url = input()
+    else:
+        break
+
 #prompt for directory name, create directory
 print("Enter a name for your folder:")
 folderName = input()
 path = os.path.join(path, folderName)
+print(path)
 
 try:    
     os.mkdir(path)
@@ -26,28 +40,25 @@ except:
     print("Folder already exists. Try again.")
     exit()
 
-#get website
-while True:
-    try:
-        response = requests.get(url)
-    except:
-        print("Invalid site. Enter site:")
-        url = input()
-    else:
-        break
         
 #download HTML and save in folder
 with open(folderName.lower().replace(" ","-") + ".html", "wb") as html:
     html.write(response.content)
     
-print("Success!")
 #parse to soup
 soup = BeautifulSoup(response.text, "html.parser")
 
+#disable SSL certificate validation temporarily
+ctx = ssl.create_default_context()
+ctx.check_hostname = False
+ctx.verify_mode = ssl.CERT_NONE
+
 def saveImage(link):
     p = path
-    imgFile = Image.open(urlopen(link))
+#    print("Path to save file in: " + p)
+    imgFile = Image.open(urlopen(link, context=ctx))
     if ".gif" not in link:
+
         imgFile.save(p + r"\img_" + str(uuid.uuid4()) +".png", "PNG")
     else: 
         with open(p + r"\animated-img_" + str(uuid.uuid4()) +".gif", "wb") as f:
