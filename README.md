@@ -1,1 +1,1 @@
-Basic script that pulls images and gifs from an adobe portfolio link and saves it locally
+Basic script that pulls images, gifs and videos from an Adobe portfolio link and saves it to a specific folder.
